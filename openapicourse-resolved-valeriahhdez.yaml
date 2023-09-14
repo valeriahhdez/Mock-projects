@@ -25,6 +25,10 @@ servers:
 paths:
   /v1/beers:
     get:
+      parameters: 
+        - $ref: "#/components/parameters/pageNumberParam"
+        - $ref: "#/components/parameters/pageSizeParam"
+        
       responses: 
         '200':
           description: List of beers
@@ -37,9 +41,32 @@ paths:
                     
         "404":
           description: No beers found
-
+  /v1/beers/{beerId}:
+    get:  
+      parameters:
+      - name: beerId
+        in: path 
+        description: Beer ID 
+        required: true
+        schema: 
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Beer found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Beer" 
   /v1/customers:
     get:
+      parameters: 
+        - $ref: "#/components/parameters/pageNumberParam"
+        - $ref: "#/components/parameters/pageSizeParam"
+      tags:
+        - Customers
+      summary: Retrieve a list of customers
+      description: Retrieve a list of customers 
       responses: 
         '200':
           description: List of Customers
@@ -47,9 +74,45 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/customerPagedList"
-                            
+
+  /v1/customers/{customerId}:
+    get:  
+      parameters:
+      - name: customerId
+        in: path 
+        description: Customer ID 
+        required: true
+        schema: 
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Customer found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"                            
+
 
 components:
+  parameters: 
+    pageNumberParam:
+      name: pageNumber 
+      in: query
+      description: Page number
+      schema:
+        type: integer
+        format: int32
+        default: 1
+    pageSizeParam: 
+      name: pageSize 
+      in: query
+      description: Page size
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 25
   schemas:
     address:
       type: object
@@ -161,7 +224,7 @@ components:
       items:
         $ref: "#/components/schemas/Beer"
 
-    # new object for response pagination
+    # new object for pagination
     PagedResponse:
       type: object
       properties:
