@@ -1,0 +1,215 @@
+---
+openapi: 3.0.2
+# Info Object
+info:
+  title: OpenAPI course
+  #summary: Open API course specification 
+  description: Specification for OpenAPI course
+  contact:
+    name: Valeria Luzardo
+    email: valeriahhdez@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: "1.0"
+
+# Server Object
+servers:
+  - url: https://dev.example.com
+    description: Development server
+  - url: https://qa.example.com
+    description: Quality Assurance server
+  - url: https://prod.example.com
+    description: Production server
+
+paths:
+  /v1/beers:
+    get:
+      responses: 
+        '200':
+          description: List of beers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BeerList"
+                 
+                  
+                    
+        "404":
+          description: No beers found
+
+  /v1/customers:
+    get:
+      responses: 
+        '200':
+          description: List of Customers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/customerPagedList"
+                            
+
+components:
+  schemas:
+    address:
+      type: object
+      properties:
+        street:
+          type: string
+          example: C. Obsidiana
+        city: 
+          type: string
+          example: Xalapa
+        zipCode: 
+          type: string
+          example: 91000
+        stateCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: 2-letter code of State
+          enum: 
+            [MA, CA, TX, FL]
+    Customer: 
+      type: object
+      description: Customer object
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: Valeria
+        lastName: 
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: Luzardo
+        address:
+          $ref: "#/components/schemas/address" 
+    CustomerList: 
+      type: array
+      minItems: 1
+      maxItems: 100
+      description: List of Customers
+      items: 
+        $ref: "#/components/schemas/Customer"
+    #create new object
+    customerPagedList:
+      type: object
+      # this tells the specification that object customerPagedList should inherit all the schema of the PagedResponse object
+      allOf:
+      #by default this has to be a list
+        - $ref: "#/components/schemas/PagedResponse"
+      properties:
+        content:
+        # take the content of object Customer List
+          $ref: "#/components/schemas/CustomerList"
+
+
+    # Beer components
+    brewery:
+      type: object # this is not an array because is not going
+      # to list several breweries
+      description: Brewery that produces the beer
+      properties:
+        name:
+          type: string
+          description: Name of the brewery
+          example: Grupo Modelo
+        location:
+          type: string
+          description: Brewery location
+          example: Mexico
+    
+    Beer: 
+      type: object
+      description: Beer object
+      properties:
+        beerName:
+          type: string
+          description: Name of the beer
+          example: Negra Modelo
+        style:
+          type: string
+          description: Style of the beer
+          enum:
+            - LAGER
+            - ALE
+            - PALE_ALE
+            - IPA
+            - WHEAT
+        price:
+          type: number
+          format: float
+          description: Price of the beer
+          example: 12.5
+        quantity:
+          type: integer
+          description: Number of beer available
+          example: 15
+        breweryName: 
+          $ref: "#/components/schemas/brewery"
+    
+    BeerList: 
+      type: array
+      minItems: 1
+      maxItems: 50
+      description: List of beers
+      items:
+        $ref: "#/components/schemas/Beer"
+
+    # new object for response pagination
+    PagedResponse:
+      type: object
+      properties:
+        pageable:
+          $ref: '#/components/schemas/PagedResponse_pageable'
+        totalPages:
+          type: integer
+          format: int32
+        last:
+          type: boolean
+        totalElements:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        numberOfElements:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/PagedResponse_pageable_sort'
+        first:
+          type: boolean
+    PagedResponse_pageable_sort:
+      type: object
+      properties:
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+    PagedResponse_pageable:
+      type: object
+      properties:
+        sort:
+          $ref: '#/components/schemas/PagedResponse_pageable_sort'
+        offset:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
