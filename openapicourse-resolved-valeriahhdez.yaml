@@ -66,10 +66,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BeerList"
-                 
-                  
-                    
+                $ref: "#/components/schemas/BeerList"    
+        "400":
+          description: Bad request
+            
         "404":
           description: No beers found
 
@@ -126,7 +126,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Beer" 
-
         '400':
           description: Bad request.         
 
@@ -178,6 +177,8 @@ paths:
                 type: string
                 format: uuid
                 example: http://example.com/v1/customers/{assignedIdValue} 
+        "404":
+          description: Not found
 
         "400":
           description: Bad request.
@@ -276,6 +277,10 @@ paths:
       parameters:
         - $ref: "#/components/parameters/customerIdPathParam"
       
+      ## Security
+      # Here I override the security scheme that has been specified for all the endpoints
+      # No security needed
+      security: []
       ## Responses
       responses:
         '200':
@@ -284,7 +289,14 @@ paths:
         '404':
           description: Not found.    
 
+security:
+  - BasicAuth: []
+
 components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
   ## These are parameters of the operation (request)
   ## they can be path, query, header, or cookie parameter.  
   parameters: 
